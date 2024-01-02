@@ -1,0 +1,109 @@
+
+// Developer: Forex Robot Easy Team
+// Website: forexroboteasy.com
+
+#property strict
+
+// Define the maximum number of symbols to scan
+#define MAX_SYMBOLS 100
+
+// Define the maximum number of timeframes to scan
+#define MAX_TIMEFRAMES 10
+
+// Define the parameters for the Wolfe Wave pattern
+input double PipsThreshold = 10.0; // Minimum pips difference between points 1 and 4
+input double DeviationThreshold = 0.001; // Maximum deviation allowed for points 2 and 3
+input double ChannelDeviation = 0.001; // Deviation used for channel construction
+
+// Define a structure to store the pattern information
+struct SWolfeWavePattern
+{
+   datetime time; // Time when the pattern was detected
+   string symbol; // Symbol of the pattern
+   int timeframe; // Timeframe of the pattern
+   double point1; // Price level of point 1
+   double point2; // Price level of point 2
+   double point3; // Price level of point 3
+   double point4; // Price level of point 4
+};
+
+// Define an array to store the detected patterns
+SWolfeWavePattern patterns[];
+
+// Function to initiate a full scan of all symbols across all timeframes
+void OneClickScan()
+{
+   ResetPatterns(); // Clear the patterns array
+   
+   // Loop through all symbols
+   string symbols[MAX_SYMBOLS];
+   int totalSymbols = SymbolsTotal();
+   for(int i = 0; i < totalSymbols && i < MAX_SYMBOLS; i++)
+   {
+      symbols[i] = SymbolName(i, true);
+   }
+   
+   // Loop through all timeframes
+   int timeframes[MAX_TIMEFRAMES] = {PERIOD_M1, PERIOD_M5, PERIOD_M15, PERIOD_M30, PERIOD_H1, PERIOD_H4, PERIOD_D1, PERIOD_W1, PERIOD_MN1};
+   for(int j = 0; j < ArraySize(timeframes) && j < MAX_TIMEFRAMES; j++)
+   {
+      int timeframe = timeframes[j];
+      
+      // Loop through all symbols
+      for(int k = 0; k < totalSymbols && k < MAX_SYMBOLS; k++)
+      {
+         string symbol = symbols[k];
+         
+         // Calculate the Wolfe Wave pattern for the symbol and timeframe
+         SWolfeWavePattern pattern = CalculateWolfeWavePattern(symbol, timeframe);
+         
+         // Add the pattern to the patterns array if it meets the criteria
+         if(pattern.point4 - pattern.point1 >= PipsThreshold && MathAbs(pattern.point2 - pattern.point3) <= DeviationThreshold)
+         {
+            patterns[ArraySize(patterns)] = pattern;
+         }
+      }
+   }
+   
+   // Display the detected patterns on the MT4 platform
+   DisplayPatterns();
+   
+   // Send alerts or notifications for the detected patterns
+   SendAlerts();
+}
+
+// Function to calculate the Wolfe Wave pattern for a given symbol and timeframe
+SWolfeWavePattern CalculateWolfeWavePattern(string symbol, int timeframe)
+{
+   SWolfeWavePattern pattern;
+   // TODO: Implement the calculation logic for the Wolfe Wave pattern
+   // This function should calculate the price levels for points 1, 2, 3, and 4 of the Wolfe Wave pattern
+   
+   return pattern;
+}
+
+// Function to display the detected patterns on the MT4 platform
+void DisplayPatterns()
+{
+   // TODO: Implement the code to display the patterns on the MT4 platform
+   // This function should draw lines or shapes on the chart to represent the Wolfe Wave patterns
+}
+
+// Function to send alerts or notifications for the detected patterns
+void SendAlerts()
+{
+   // TODO: Implement the code to send alerts or notifications for the detected patterns
+   // This function should send an alert or notification to the user when a Wolfe Wave pattern is detected
+}
+
+// Function to reset the patterns array
+void ResetPatterns()
+{
+   ArrayResize(patterns, 0);
+}
+
+// Entry point of the program
+void OnStart()
+{
+   OneClickScan();
+}
